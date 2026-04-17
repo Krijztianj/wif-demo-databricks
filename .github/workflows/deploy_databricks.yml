@@ -1,0 +1,39 @@
+name: Deploy DAB
+
+on:
+  workflow_call:
+    inputs:
+      Environment:
+        type: string
+        required: true
+      pool:
+        type: string
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ${{ inputs.pool }}
+    environment: ${{ inputs.Environment }}
+
+    env:
+      AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: databricks/setup-cli@main
+
+      - name: Authenticate to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ env.AZURE_CLIENT_ID }}
+          tenant-id: ${{ env.AZURE_TENANT_ID }}
+          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Validate bundle
+        run: databricks bundle validate -t ${{ inputs.Environment }}
+
+      - name: Deploy bundle
+        run: databricks bundle deploy -t ${{ inputs.Environment }} --force-lock

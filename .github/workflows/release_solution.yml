@@ -1,0 +1,18 @@
+name: Release Solution
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  id-token: write   # Required — allows GitHub to mint an OIDC token
+  contents: read
+
+jobs:
+  Dev:
+    name: Release Databricks to Dev
+    uses: ./.github/workflows/deploy_databricks.yml
+    with:
+      Environment: dev
+      pool: your-runner-pool
+    secrets: inherit

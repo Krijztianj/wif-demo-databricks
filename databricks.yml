@@ -1,0 +1,22 @@
+bundle:
+  name: wif-demo-databricks
+
+resources:
+  jobs:
+    hello_world:
+      name: "[${bundle.target}] Hello World"
+      tasks:
+        - task_key: run_notebook
+          notebook_task:
+            notebook_path: ./notebooks/hello_world
+          new_cluster:
+            spark_version: 15.4.x-scala2.12
+            node_type_id: Standard_DS3_v2
+            num_workers: 1
+
+targets:
+  dev:
+    mode: development
+    workspace:
+      host: https://adb-5019569328377760.0.azuredatabricks.net
+      auth_type: azure-cli
